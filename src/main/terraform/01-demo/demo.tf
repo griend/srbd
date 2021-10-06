@@ -46,6 +46,25 @@ EOF
   images      = ["linode/debian11"]
 }
 
+resource "linode_firewall" "demo_firewall" {
+  label = "demo_firewall"
+  tags  = [ "demo"]
+
+  inbound {
+    label    = "allow-ssh"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "22"
+    ipv4     = ["213.127.47.116/32"]
+  }
+
+  inbound_policy = "DROP"
+
+  outbound_policy = "ACCEPT"
+
+  linodes = [linode_instance.demo.id]
+}
+
 resource "linode_instance" "demo" {
   image           = "linode/debian11"
   label           = "demo"
