@@ -23,32 +23,9 @@ output "linode_root_password" {
   value = random_string.linode_root_password.result
 }
 
-resource "linode_stackscript" "demo" {
-  label       = "demo"
-  description = "Sets up the node"
-  script      = <<EOF
-#!/bin/bash
-
-DIST="Unknown"
-
-if [ -x /usr/bin/lsb_release ] ; then
-    DIST=$(/usr/bin/lsb_release -is)
-fi
-
-case $(lsb_release -is) in:
-    Debian)
-        apt-get -q update
-        apt-get -q -y full-upgrade
-        apt-get clean
-        ;;
-esac
-EOF
-  images      = ["linode/debian11"]
-}
-
 resource "linode_firewall" "demo_firewall" {
   label = "demo_firewall"
-  tags  = [ "demo"]
+  tags  = ["demo"]
 
   inbound {
     label    = "allow-ssh"
@@ -62,24 +39,23 @@ resource "linode_firewall" "demo_firewall" {
 
   outbound_policy = "ACCEPT"
 
-  linodes = [linode_instance.demo.id]
+  linodes = [linode_instance.demo01.id]
 }
 
-resource "linode_instance" "demo" {
+resource "linode_instance" "demo01" {
   image           = "linode/debian11"
-  label           = "demo"
-  group           = "demo"
+  label           = "demo01"
   region          = "eu-central"
   type            = "g6-standard-1"
   authorized_keys = ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAtBQ/gFn5J5/S2mBISA5lxoxxt3Kv0Tv3WGPEJQMqdu cees@griend.eu"]
   root_pass       = random_string.linode_root_password.result
-  stackscript_id  = linode_stackscript.demo.id
+  tags            = ["demo"]
 }
 
-resource "linode_domain_record" "demo4" {
+resource "linode_domain_record" "demo01" {
   domain_id   = var.linode_domain_id
-  name        = "demo"
+  name        = linode_instance.demo01.label
   record_type = "A"
-  target      = linode_instance.demo.ip_address
+  target      = linode_instance.demo01.ip_address
   ttl_sec     = 300
 }
