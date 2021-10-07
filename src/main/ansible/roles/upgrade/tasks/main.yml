@@ -1,5 +1,0 @@
----
-- name: Apt update
-  apt:
-    upgrade: full
-    update_cache: yes
