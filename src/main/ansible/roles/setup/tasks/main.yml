@@ -1,9 +1,0 @@
----
-- name: Hostname
-  hostname:
-    name: "{{ inventory_hostname }}"
-
-- name: Apt upgrade
-  apt:
-    upgrade: full
-    update_cache: true
